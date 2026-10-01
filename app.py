@@ -31,5 +31,15 @@ def log_water(amount):
     conn.close()
     return f"Logged {amount}ml at {timestamp}"
 
+@app.route("/today")
+def today_total():
+    conn = sqlite3.connect("hydra.db")
+    cursor = conn.execute("SELECT SUM(amount) FROM water_log WHERE date(timestamp) = date('now')")
+    result = cursor.fetchone()
+    conn.close()
+    
+    total = result[0] if result[0] is not None else 0
+    return f"Today's total: {total}ml"
+
 if __name__ == "__main__":
     app.run(debug=True)
