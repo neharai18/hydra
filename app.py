@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask
+from flask import Flask, render_template
 import sqlite3
 
 app = Flask(__name__)
@@ -67,5 +67,37 @@ def progress():
     
     return f"Progress: {today_total}ml / {daily_goal}ml ({percentage}%)"
 
+@app.route("/dashboard")
+def dashboard():
+    conn = sqlite3.connect("hydra.db")
+    hour = datetime.now().hour
+    if hour < 12:
+        greeting = "Good morning"
+    elif hour < 17:
+        greeting = "Good afternoon"
+    else:
+        greeting = "Good evening"
+    today_date = datetime.now().strftime("%a, %d %b")
+    
+    today_cursor = conn.execute("SELECT SUM(amount) FROM water_log WHERE date(timestamp) = date('now')")
+    today_result = today_cursor.fetchone()
+    today_total = today_result[0] if today_result[0] is not None else 0
+    
+    goal_cursor = conn.execute("SELECT daily_goal FROM settings WHERE id = 1")
+    daily_goal = goal_cursor.fetchone()[0]
+    
+    week_cursor = conn.execute("""
+        SELECT date(timestamp) as day, SUM(amount) as total
+        FROM water_log
+        WHERE date(timestamp) >= date('now', '-6 days')
+        GROUP BY date(timestamp)
+        ORDER BY day
+    """)
+    week_data = {row[0]: row[1] for row in week_cursor.fetchall()}
+    conn.close()
+    
+    percentage = round((today_total / daily_goal) * 100, 1)
+    
+    return render_template("dashboard.html", today_total=today_total, daily_goal=daily_goal, percentage=percentage, week_data=week_data, greeting=greeting, today_date=today_date)
 if __name__ == "__main__":
     app.run(debug=True)
