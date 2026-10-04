@@ -24,6 +24,29 @@ def init_db():
     """)
     conn.commit()
     conn.close()
+def calculate_streak():
+    conn = sqlite3.connect("hydra.db")
+    goal = conn.execute("SELECT daily_goal FROM settings WHERE id = 1").fetchone()[0]
+    
+    streak = 0
+    day_offset = 0
+    
+    while True:
+        cursor = conn.execute(
+            "SELECT SUM(amount) FROM water_log WHERE date(timestamp) = date('now', ?)",
+            (f'-{day_offset} days',)
+        )
+        total = cursor.fetchone()[0]
+        total = total if total is not None else 0
+        
+        if total >= goal:
+            streak += 1
+            day_offset += 1
+        else:
+            break
+    
+    conn.close()
+    return streak   
 
 init_db()
 
@@ -94,10 +117,11 @@ def dashboard():
         ORDER BY day
     """)
     week_data = {row[0]: row[1] for row in week_cursor.fetchall()}
+    streak = calculate_streak()
     conn.close()
     
     percentage = round((today_total / daily_goal) * 100, 1)
     
-    return render_template("dashboard.html", today_total=today_total, daily_goal=daily_goal, percentage=percentage, week_data=week_data, greeting=greeting, today_date=today_date)
+    return render_template("dashboard.html", today_total=today_total, daily_goal=daily_goal, percentage=percentage, week_data=week_data, greeting=greeting, today_date=today_date, streak=streak)
 if __name__ == "__main__":
     app.run(debug=True)
