@@ -117,11 +117,18 @@ def dashboard():
         ORDER BY day
     """)
     week_data = {row[0]: row[1] for row in week_cursor.fetchall()}
+    from datetime import timedelta
+    last_7_days = []
+    for i in range(6, -1, -1):
+        day = (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d")
+        day_label = (datetime.now() - timedelta(days=i)).strftime("%a")
+        amount = week_data.get(day, 0)
+        last_7_days.append({"label": day_label, "amount": amount})
     streak = calculate_streak()
     conn.close()
     
     percentage = round((today_total / daily_goal) * 100, 1)
     
-    return render_template("dashboard.html", today_total=today_total, daily_goal=daily_goal, percentage=percentage, week_data=week_data, greeting=greeting, today_date=today_date, streak=streak)
+    return render_template("dashboard.html", today_total=today_total, daily_goal=daily_goal, percentage=percentage, week_data=week_data, greeting=greeting, today_date=today_date, streak=streak, last_7_days=last_7_days)
 if __name__ == "__main__":
     app.run(debug=True)
