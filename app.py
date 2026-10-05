@@ -52,7 +52,7 @@ init_db()
 
 @app.route("/")
 def home():
-    return "HYDRA is running!"
+    return redirect("/dashboard")
 
 @app.route("/log/<int:amount>")
 def log_water(amount):
