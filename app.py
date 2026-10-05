@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect
 import sqlite3
 
 app = Flask(__name__)
@@ -61,7 +61,7 @@ def log_water(amount):
     conn.execute("INSERT INTO water_log (amount, timestamp) VALUES (?, ?)", (amount, timestamp))
     conn.commit()
     conn.close()
-    return f"Logged {amount}ml at {timestamp}"
+    return redirect("/dashboard")
 
 @app.route("/today")
 def today_total():
@@ -89,6 +89,20 @@ def progress():
     percentage = round((today_total / daily_goal) * 100, 1)
     
     return f"Progress: {today_total}ml / {daily_goal}ml ({percentage}%)"
+@app.route("/set-goal/<int:new_goal>")
+def set_goal(new_goal):
+    conn = sqlite3.connect("hydra.db")
+    conn.execute("UPDATE settings SET daily_goal = ? WHERE id = 1", (new_goal,))
+    conn.commit()
+    conn.close()
+    return redirect("/dashboard")
+@app.route("/undo")
+def undo_last():
+    conn = sqlite3.connect("hydra.db")
+    conn.execute("DELETE FROM water_log WHERE id = (SELECT MAX(id) FROM water_log)")
+    conn.commit()
+    conn.close()
+    return redirect("/dashboard")
 
 @app.route("/dashboard")
 def dashboard():

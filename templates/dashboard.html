@@ -153,7 +153,7 @@ h1 { font-family:'Comfortaa',cursive; font-weight:700; font-size:1.4em; color:va
     <div class="stats-row">
     <div class="stat"><span class="stat-label">consumed</span><span class="stat-value">{{ today_total }}ml</span></div>
     <div class="stat-divider"></div>
-    <div class="stat"><span class="stat-label">goal</span><span class="stat-value">{{ daily_goal }}ml</span></div>
+   <div class="stat"><span class="stat-label">goal</span><span class="stat-value" onclick="editGoal({{ daily_goal }})" style="cursor:pointer; text-decoration:underline dotted;">{{ daily_goal }}ml</span></div> 
     <div class="stat-divider"></div>
     <div class="stat"><span class="stat-label">streak</span><span class="stat-value">{{ streak }}🔥</span></div>
   </div>
@@ -175,6 +175,9 @@ h1 { font-family:'Comfortaa',cursive; font-weight:700; font-size:1.4em; color:va
     <a href="/log/500" class="add-btn">+500</a>
     <a href="/log/750" class="add-btn">+750</a>
   </div>
+  <div style="margin-top: 8px;">
+    <a href="/undo" class="add-btn" style="background: rgba(255,200,200,0.5); font-size: 0.78em;" onclick="return confirm('Remove your last water log entry?');">↺ undo last</a>
+  </div>
 </main>
 
 <script>
@@ -194,6 +197,12 @@ document.querySelectorAll('.add-btn').forEach(btn => {
     setTimeout(() => window.location.href = href, 350);
   });
 });
+function editGoal(current) {
+  const newGoal = prompt("Set your daily water goal (ml):", current);
+  if (newGoal && !isNaN(newGoal) && newGoal > 0) {
+    window.location.href = "/set-goal/" + newGoal;
+  }
+}
 </script>
 </body>
 </html>
