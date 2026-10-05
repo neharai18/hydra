@@ -145,4 +145,4 @@ def dashboard():
     
     return render_template("dashboard.html", today_total=today_total, daily_goal=daily_goal, percentage=percentage, week_data=week_data, greeting=greeting, today_date=today_date, streak=streak, last_7_days=last_7_days)
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False, host="0.0.0.0", port=5000)
