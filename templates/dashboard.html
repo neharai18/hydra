@@ -139,7 +139,7 @@ h1 { font-family:'Comfortaa',cursive; font-weight:700; font-size:1.4em; color:va
     <div class="card-head"><span class="logo-drop">💧</span><h1>HYDRA</h1></div>
     <span class="date-chip">{{ today_date }}</span>
   </div>
-  <p class="greeting">{{ greeting }} 👋</p>
+  <p class="greeting" id="greeting">Hello 👋</p>
   <p class="tagline">stay fresh, stay you</p>
 
   <div class="jug-wrap">
@@ -181,6 +181,12 @@ h1 { font-family:'Comfortaa',cursive; font-weight:700; font-size:1.4em; color:va
 </main>
 
 <script>
+const hour = new Date().getHours();
+let greetingText = "Good evening";
+if (hour < 12) greetingText = "Good morning";
+else if (hour < 17) greetingText = "Good afternoon";
+document.getElementById('greeting').textContent = greetingText + " 👋";
+
 document.querySelectorAll('.add-btn').forEach(btn => {
   btn.addEventListener('click', function(e) {
     e.preventDefault();
@@ -197,12 +203,6 @@ document.querySelectorAll('.add-btn').forEach(btn => {
     setTimeout(() => window.location.href = href, 350);
   });
 });
-function editGoal(current) {
-  const newGoal = prompt("Set your daily water goal (ml):", current);
-  if (newGoal && !isNaN(newGoal) && newGoal > 0) {
-    window.location.href = "/set-goal/" + newGoal;
-  }
-}
 </script>
 </body>
 </html>
