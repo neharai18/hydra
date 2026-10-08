@@ -153,7 +153,7 @@ h1 { font-family:'Comfortaa',cursive; font-weight:700; font-size:1.4em; color:va
     <div class="stats-row">
     <div class="stat"><span class="stat-label">consumed</span><span class="stat-value">{{ today_total }}ml</span></div>
     <div class="stat-divider"></div>
-   <div class="stat"><span class="stat-label">goal</span><span class="stat-value" onclick="editGoal({{ daily_goal }})" style="cursor:pointer; text-decoration:underline dotted;">{{ daily_goal }}ml</span></div> 
+   <div class="stat"><span class="stat-label">goal</span><span class="stat-value" onclick="editGoal({{ daily_goal }})" style="cursor:pointer; text-decoration:underline dotted;">{{ daily_goal }}ml</span></div>
     <div class="stat-divider"></div>
     <div class="stat"><span class="stat-label">streak</span><span class="stat-value">{{ streak }}🔥</span></div>
   </div>
@@ -187,10 +187,18 @@ if (hour < 12) greetingText = "Good morning";
 else if (hour < 17) greetingText = "Good afternoon";
 document.getElementById('greeting').textContent = greetingText + " 👋";
 
+function editGoal(current) {
+  const newGoal = prompt("Set your daily water goal (ml):", current);
+  if (newGoal && !isNaN(newGoal) && newGoal > 0) {
+    window.location.href = "/set-goal/" + newGoal;
+  }
+}
+
 document.querySelectorAll('.add-btn').forEach(btn => {
   btn.addEventListener('click', function(e) {
-    e.preventDefault();
     const href = this.getAttribute('href');
+    if (href === '/undo') return;   // let the undo confirm popup handle itself
+    e.preventDefault();
     const rect = this.getBoundingClientRect();
     for (let i = 0; i < 3; i++) {
       const drop = document.createElement('span');
